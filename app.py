@@ -1,4 +1,4 @@
-import streamlit as st
+yimport streamlit as st
 import time
 import re
 from difflib import SequenceMatcher
@@ -131,8 +131,17 @@ if st.button("Generate Listing 💸"):
     if check_paywall():
         st.session_state["uses"] += 1
 
-        details = {"brand": "Example", "item": "Item"}  # placeholder
-        st.success("Listing generated successfully!")
+        # Simple demo output
+        brand = best_match_brand(user_text)
+        title = f"{brand} {user_text.split()[1].capitalize()} Listing"
+        description = f"This {user_text} is in great condition. Perfect for everyday wear!"
+        tags = [brand, "fashion", "vinted", "resale", "smart-seller"]
+        price = "£5.00"
 
+        st.success("Listing generated successfully!")
+        st.markdown(f"**Title:** {title}")
+        st.markdown(f"**Description:** {description}")
+        st.markdown(f"**Tags:** {', '.join(tags)}")
+        st.markdown(f"**Suggested Price:** {price}")
         
 st.markdown("</div>", unsafe_allow_html=True)
