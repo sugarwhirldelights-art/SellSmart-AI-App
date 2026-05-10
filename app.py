@@ -27,10 +27,49 @@ st.set_page_config(
 )
 
 # -----------------------------------
-# HEADER WITH YOUR LOGO
+# HEADER WITH GLOW LOGO + GLOW SUBTITLE
 # -----------------------------------
-st.image("image_1778389857310.jpeg", width=180)
-st.markdown("<h3 style='text-align:center; color:#6b7280;'>Create perfect Vinted listings in seconds</h3>", unsafe_allow_html=True)
+
+st.markdown("""
+<style>
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.logo-glow {
+    width: 380px;
+    border-radius: 14px;
+    box-shadow:
+        0 0 35px rgba(0, 255, 150, 0.75),
+        0 0 75px rgba(0, 255, 150, 0.55),
+        0 0 120px rgba(0, 255, 150, 0.45);
+}
+
+.subtitle-glow {
+    text-align: center;
+    font-size: 20px;
+    margin-top: 5px;
+    color: #e5e7eb;
+    text-shadow:
+        0 0 6px rgba(0, 255, 150, 0.55),
+        0 0 12px rgba(0, 255, 150, 0.35),
+        0 0 18px rgba(0, 255, 150, 0.25);
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# LOGO
+st.markdown("<div class='logo-container'>", unsafe_allow_html=True)
+st.image("image_1778389857310.jpeg", width=380)
+st.markdown("</div>", unsafe_allow_html=True)
+
+# SUBTITLE
+st.markdown("<h3 class='subtitle-glow'>Create perfect Vinted listings in seconds</h3>", unsafe_allow_html=True)
 st.write("")
 
 # -----------------------------------
