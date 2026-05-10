@@ -16,7 +16,72 @@ if "uses" not in st.session_state:
 
 if "premium" not in st.session_state:
     st.session_state["premium"] = False
+# -----------------------------------
+# GLOBAL UI STYLING (PREMIUM THEME)
+# -----------------------------------
+st.markdown("""
+<style>
 
+html, body, [class*="css"]  {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Center the main content */
+.main {
+    padding-top: 20px;
+}
+
+/* Input box styling */
+textarea {
+    border-radius: 12px !important;
+    border: 1px solid #3a3a3a !important;
+    background-color: #111 !important;
+    color: #e5e5e5 !important;
+    padding: 12px !important;
+    font-size: 15px !important;
+}
+
+/* Card container */
+.card {
+    background-color: #0f0f0f;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 0 25px rgba(0, 255, 150, 0.15);
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Generate button */
+div.stButton > button {
+    background: linear-gradient(90deg, #00ff9a, #00c26e);
+    color: black;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-size: 17px;
+    font-weight: 600;
+    border: none;
+    width: 100%;
+    transition: 0.2s ease-in-out;
+}
+
+div.stButton > button:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(0, 255, 150, 0.4);
+}
+
+/* Output code boxes */
+code {
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+}
+
+/* Footer spacing */
+footer {
+    margin-top: 40px;
+}
+
+</style>
+""", unsafe_allow_html=True)
 # -----------------------------------
 # PAGE CONFIG
 # -----------------------------------
