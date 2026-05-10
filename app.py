@@ -35,8 +35,8 @@ if "history" not in st.session_state:
 
 DAILY_FREE_LIMIT = 5
 
-WEEKLY_LINK = "https://buy.stripe.com/test_weekly_link_here"
-MONTHLY_LINK = "https://buy.stripe.com/test_monthly_link_here"
+WEEKLY_LINK = "https://buy.stripe.com/aFadR9arXe0m6Mv4wHg3601"
+MONTHLY_LINK = "https://buy.stripe.com/9B63cvfMhg8u3Aj4wHg3602"
 
 # =========================================================
 # STYLING
