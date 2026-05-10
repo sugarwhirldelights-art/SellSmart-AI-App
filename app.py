@@ -90,7 +90,12 @@ st.set_page_config(
     page_icon="💸",
     layout="centered"
 )
-
+with st.sidebar:
+    st.markdown("### 📄 Policies")
+    st.page_link("pages/Terms.py", label="Terms of Service")
+    st.page_link("pages/Privacy.py", label="Privacy Policy")
+    st.page_link("pages/AUP.py", label="Acceptable Use")
+    st.page_link("pages/Refunds.py", label="Refund Policy")
 # -----------------------------------
 # HEADER WITH GLOW LOGO + GLOW SUBTITLE
 # -----------------------------------
