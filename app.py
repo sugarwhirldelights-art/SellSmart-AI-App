@@ -3,8 +3,8 @@ import re
 from difflib import SequenceMatcher
 
 # -----------------------------------
-# SELL SMART AI – PREMIUM APP
-# Free plan: 3 listings/day
+# SELL SMART AI – v2.0
+# Free: 3 listings/day
 # Premium: Unlimited
 # -----------------------------------
 
@@ -30,15 +30,18 @@ st.set_page_config(
 st.markdown("""
 <style>
 body {background-color: #f0f2f6;}
-.big-title {font-size: 40px; font-weight: 800; text-align: center; color: #2b2b2b;}
-.sub {font-size: 20px; text-align: center; color: #666;}
-.box {background: white; padding: 25px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);}
-.output-box {background: #fafafa; padding: 20px; border-radius: 12px; border: 1px solid #ddd;}
+.big-title {font-size: 40px; font-weight: 800; text-align: center; color: #1f2933;}
+.sub {font-size: 18px; text-align: center; color: #6b7280;}
+.box {background: white; padding: 24px; border-radius: 16px; box-shadow: 0 10px 30px rgba(15,23,42,0.12);}
+.output-box {background: #f9fafb; padding: 18px; border-radius: 12px; border: 1px solid #e5e7eb;}
+.badge {display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600;}
+.badge-free {background:#e5f3ff; color:#1d4ed8;}
+.badge-premium {background:#fef3c7; color:#92400e;}
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown("<div class='big-title'>SellSmart AI</div>", unsafe_allow_html=True)
-st.markdown("<div class='sub'>Create perfect Vinted listings in seconds</div>", unsafe_allow_html=True)
+st.markdown("<div class='sub'>Turn messy Vinted ideas into clean, ready-to-post listings.</div>", unsafe_allow_html=True)
 st.write("")
 
 # -----------------------------------
@@ -49,6 +52,11 @@ def check_paywall():
         return True
 
     if st.session_state["uses"] < 3:
+        left = 3 - st.session_state["uses"]
+        st.markdown(
+            f"<span class='badge badge-free'>Free uses left today: {left}</span>",
+            unsafe_allow_html=True
+        )
         return True
 
     st.error("You’ve reached your free limit (3 listings/day). Upgrade to Premium for unlimited use.")
@@ -85,19 +93,57 @@ def best_match_brand(text):
 
         for w in words:
             r = fuzzy_ratio(w, brand)
-            if r > score and r > 0.75:
+            if r > score and r > 0.78:
                 score = r
                 best = brand
 
     return best.title()
 
 # -----------------------------------
-# INPUT BOX
+# HELPER: PRICE ESTIMATE
+# -----------------------------------
+def estimate_price(brand, item):
+    brand = brand.lower()
+    base_low, base_high = 4, 8
+
+    high_brands = ["nike","adidas","north face","stone island","moncler","jordan","yeezy","ralph lauren"]
+    budget_brands = ["primark","shein","new look","george","matalan"]
+
+    if any(b in brand for b in high_brands):
+        base_low, base_high = 12, 25
+    elif any(b in brand for b in budget_brands):
+        base_low, base_high = 3, 7
+
+    if item in ["hoodie","jacket","coat","jeans","tracksuit"]:
+        base_low += 3
+        base_high += 5
+
+    return f"£{base_low:.0f}.00 - £{base_high:.0f}.00"
+
+# -----------------------------------
+# MAIN BOX
 # -----------------------------------
 st.markdown("<div class='box'>", unsafe_allow_html=True)
-user_text = st.text_area("Paste your messy item description:", height=180)
 
-if st.button("Generate Listing 💸"):
+st.markdown(
+    "<span class='badge badge-premium'>v2.0 • Listing Generator</span>",
+    unsafe_allow_html=True
+)
+st.write("")
+
+user_text = st.text_area(
+    "Paste your messy item description:",
+    height=160,
+    placeholder="e.g. blue primark shorts size 10 worn a few times but still good"
+)
+
+col1, col2 = st.columns([2, 1])
+with col1:
+    generate = st.button("Generate Listing 💸", use_container_width=True)
+with col2:
+    st.write("")
+
+if generate:
     if check_paywall():
         st.session_state["uses"] += 1
 
@@ -121,30 +167,66 @@ if st.button("Generate Listing 💸"):
         ]
         item = next((w for w in words if w in items), "item")
 
+        # Detect condition keywords
+        condition_words = {
+            "new": ["new","brand new","with tags","nwt"],
+            "excellent": ["like new","worn once","hardly worn"],
+            "good": ["good condition","no major flaws","no marks"],
+            "used": ["worn","used","some wear","a bit worn"]
+        }
+        condition_label = "Good used condition"
+        for label, kws in condition_words.items():
+            if any(kw in text for kw in kws):
+                if label == "new":
+                    condition_label = "Brand new / with tags"
+                elif label == "excellent":
+                    condition_label = "Excellent condition"
+                elif label == "good":
+                    condition_label = "Good condition"
+                else:
+                    condition_label = "Used but still in good wearable condition"
+                break
+
         # Build title
-        title = f"{brand} {colour.capitalize()} {item.capitalize()}".strip()
+        title_parts = []
+        if brand != "Unknown":
+            title_parts.append(brand)
+        if colour:
+            title_parts.append(colour.capitalize())
+        title_parts.append(item.capitalize())
+        title = " ".join(title_parts).strip()
 
         # Build description
         description = (
-            f"{brand} {item} in {colour} colour. "
-            "Great condition with no major flaws. "
-            "Perfect for everyday wear and super comfortable. "
-            "Fast dispatch and smoke-free home."
+            f"{title}.\n\n"
+            f"{condition_label}. No major flaws unless stated. "
+            "Perfect for everyday wear and easy to style.\n\n"
+            "From a smoke-free home. Will be posted quickly after purchase."
         )
 
         # Tags
-        tags = [brand, colour, item, "fashion", "vinted", "sellsmart"]
+        tags = [t for t in [brand, colour, item, "fashion", "vinted", "sellsmart"] if t]
 
         # Price suggestion
-        price = "£4.00 - £8.00"
+        price = estimate_price(brand, item)
 
-        # Output
         st.success("Listing generated successfully!")
+
         st.markdown("<div class='output-box'>", unsafe_allow_html=True)
-        st.markdown(f"### 🏷️ Title\n{title}")
-        st.markdown(f"### 📝 Description\n{description}")
-        st.markdown(f"### 🔖 Tags\n{', '.join(tags)}")
-        st.markdown(f"### 💷 Suggested Price\n{price}")
+        st.markdown("### 🏷️ Title")
+        st.code(title, language="text")
+
+        st.markdown("### 📝 Description")
+        st.code(description, language="text")
+
+        st.markdown("### 🔖 Tags")
+        st.code(", ".join(tags), language="text")
+
+        st.markdown("### 💷 Suggested Price")
+        st.code(price, language="text")
+
+        # Copy buttons (simple UX hint)
+        st.info("Tip: long‑press on any box to copy on mobile, or use right‑click → copy on desktop.")
         st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
