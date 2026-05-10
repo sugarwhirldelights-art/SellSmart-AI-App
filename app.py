@@ -133,10 +133,22 @@ if st.button("Generate Listing 💸"):
 
         # Simple demo output
         brand = best_match_brand(user_text)
-        title = f"{brand} {user_text.split()[1].capitalize()} Listing"
-        description = f"This {user_text} is in great condition. Perfect for everyday wear!"
-        tags = [brand, "fashion", "vinted", "resale", "smart-seller"]
-        price = "£5.00"
+        # Extract colour + item name properly
+words = user_text.lower().split()
+
+# Find colour
+colours = ["black","white","grey","gray","blue","red","green","yellow","pink","purple","brown","beige","cream","navy","orange"]
+colour = next((w for w in words if w in colours), "")
+
+# Find item type (shorts, shirt, hoodie, jeans, etc.)
+items = ["shorts","shirt","tshirt","t-shirt","hoodie","jacket","coat","jeans","trousers","leggings","skirt","dress","top","jumper","sweater"]
+item = next((w for w in words if w in items), "item")
+
+# Build clean title
+title = f"{brand} {colour.capitalize()} {item.capitalize()}".strip()
+        description = f"{brand} {item} in {colour} colour. Good condition and ideal for everyday wear. Clean, comfy and ready to ship!"
+        tags = [brand, colour, item, "fashion", "vinted", "sellsmart"]
+        price = "£4.00 - £6.00"
 
         st.success("Listing generated successfully!")
         st.markdown(f"**Title:** {title}")
