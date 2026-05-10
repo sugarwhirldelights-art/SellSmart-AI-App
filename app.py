@@ -134,4 +134,5 @@ if st.button("Generate Listing 💸"):
         details = {"brand": "Example", "item": "Item"}  # placeholder
         st.success("Listing generated successfully!")
 
+        
 st.markdown("</div>", unsafe_allow_html=True)
