@@ -1,39 +1,39 @@
 import streamlit as st
-import time
 import re
 from difflib import SequenceMatcher
 
-# -----------------------------
+# -----------------------------------
 # SELL SMART AI – PREMIUM APP
 # Free plan: 3 listings/day
 # Premium: Unlimited
-# -----------------------------
+# -----------------------------------
 
 STRIPE_LINK = "https://buy.stripe.com/eVqdR92ZvbSe5Ir8MXg3600"
 
-# Track usage in session
+# Track usage
 if "uses" not in st.session_state:
     st.session_state["uses"] = 0
 
 if "premium" not in st.session_state:
     st.session_state["premium"] = False
 
-# -----------------------------
+# -----------------------------------
 # PAGE CONFIG
-# -----------------------------
+# -----------------------------------
 st.set_page_config(
     page_title="SellSmart AI",
     page_icon="💸",
     layout="centered"
 )
 
+# Premium UI styling
 st.markdown("""
 <style>
-body {background-color: #f5f5f5;}
-.big-title {font-size: 36px; font-weight: 700; text-align: center;}
-.sub {font-size: 18px; text-align: center; color: #555;}
-.box {background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1);}
-.button {font-size: 20px; font-weight: 600;}
+body {background-color: #f0f2f6;}
+.big-title {font-size: 40px; font-weight: 800; text-align: center; color: #2b2b2b;}
+.sub {font-size: 20px; text-align: center; color: #666;}
+.box {background: white; padding: 25px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);}
+.output-box {background: #fafafa; padding: 20px; border-radius: 12px; border: 1px solid #ddd;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -41,9 +41,9 @@ st.markdown("<div class='big-title'>SellSmart AI</div>", unsafe_allow_html=True)
 st.markdown("<div class='sub'>Create perfect Vinted listings in seconds</div>", unsafe_allow_html=True)
 st.write("")
 
-# -----------------------------
+# -----------------------------------
 # PAYWALL CHECK
-# -----------------------------
+# -----------------------------------
 def check_paywall():
     if st.session_state["premium"]:
         return True
@@ -55,128 +55,96 @@ def check_paywall():
     st.markdown(f"[💎 Upgrade to Premium]({STRIPE_LINK})")
     return False
 
-# -----------------------------
-# V3.3 WORKER FUNCTIONS
-# -----------------------------
-
-BRANDS = {
-    "sportswear": ["nike","adidas","puma","reebok","asics","under armour","gymshark","champion","fila","new balance","converse","vans","salomon","the north face","north face","patagonia","columbia","umbro","lotto","kappa"],
-    "streetwear": ["supreme","palace","stussy","carhartt","dickies","obey","bape","a bathing ape","off-white","essentials","trapstar","hoodrich","siksilk","11 degrees","represent","corteiz","huf","billionaire boys club"],
-    "designer": ["armani","emporio armani","giorgio armani","hugo boss","boss","calvin klein","ck","tommy hilfiger","ralph lauren","polo ralph lauren","lacoste","burberry","stone island","canada goose","moncler","diesel","guess","levi","levis","versace","kenzo","paul smith","allsaints","ted baker"],
-    "luxury": ["gucci","prada","louis vuitton","lv","balenciaga","dior","ysl","saint laurent","fendi","valentino","celine","loewe","maison margiela","givenchy","hermes","bottega veneta"],
-    "high_street": ["zara","zara man","zara woman","h&m","cos","weekday","monki","mango","pull&bear","bershka","stradivarius","river island","new look","primark","george","matalan","next","topman","topshop","asos","asos design","boohoo","boohoo man","prettylittlething","plt","missguided","shein","oh polly","house of cb","lipsy","coast","jack & jones","only & sons","selected homme"],
-    "outdoor": ["regatta","berghaus","craghoppers","helly hansen","rab","jack wolfskin","mountain warehouse","columbia","sprayway"],
-    "footwear": ["dr martens","doc martens","ugg","clarks","birkenstock","crocs","timberland","yeezy","jordan","nike air max","adidas originals","air force 1","air jordan","new balance"],
-    "kids": ["mothercare","jojo maman bébé","mini boden","boden","m&s kids","marks & spencer","george kids","next kids"]
-}
-
-ALL_BRANDS = sorted({b for group in BRANDS.values() for b in group})
+# -----------------------------------
+# BRAND DETECTION
+# -----------------------------------
+BRANDS = [
+    "nike","adidas","puma","reebok","asics","under armour","gymshark","champion","fila","new balance",
+    "converse","vans","salomon","north face","patagonia","columbia","supreme","palace","stussy",
+    "carhartt","dickies","bape","off-white","essentials","trapstar","hoodrich","siksilk","represent",
+    "corteiz","armani","hugo boss","calvin klein","ck","tommy hilfiger","ralph lauren","lacoste",
+    "burberry","stone island","moncler","diesel","guess","levi","versace","kenzo","allsaints",
+    "ted baker","gucci","prada","louis vuitton","balenciaga","dior","ysl","fendi","valentino",
+    "celine","loewe","givenchy","hermes","bottega veneta","zara","h&m","cos","weekday","mango",
+    "pull&bear","bershka","stradivarius","river island","new look","primark","asos","plt","shein",
+    "oh polly","house of cb","clarks","birkenstock","crocs","timberland","yeezy","jordan","ugg"
+]
 
 def fuzzy_ratio(a, b):
     return SequenceMatcher(None, a, b).ratio()
 
-def best_match_brand(text: str) -> str:
+def best_match_brand(text):
     text = text.lower()
-    words = set(re.findall(r"\b[a-z0-9']+\b", text))
-    best_brand = "Unknown"
-    best_score = 0
+    words = text.split()
+    best = "Unknown"
+    score = 0
 
-    for brand in ALL_BRANDS:
-        brand_lower = brand.lower()
-        brand_words = brand_lower.split()
+    for brand in BRANDS:
+        if brand in text:
+            return brand.title()
 
-        if len(brand_words) == 1:
-            if brand_lower in words:
-                score = 1
-            else:
-                score = max(fuzzy_ratio(word, brand_lower) for word in words)
-                if score < 0.8:
-                    score = 0
-        else:
-            if all(w in words for w in brand_words):
-                score = len(brand_words)
-            else:
-                score = 0
+        for w in words:
+            r = fuzzy_ratio(w, brand)
+            if r > score and r > 0.75:
+                score = r
+                best = brand
 
-        if score > best_score:
-            best_score = score
-            best_brand = brand
+    return best.title()
 
-    inference_map = {
-        "air max": "Nike",
-        "tn": "Nike",
-        "tuned": "Nike",
-        "af1": "Nike",
-        "air force": "Nike",
-        "stan smith": "Adidas",
-        "yeezy": "Adidas",
-        "jordan": "Jordan",
-        "doc martens": "Dr Martens",
-        "docs": "Dr Martens"
-    }
-
-    for key, val in inference_map.items():
-        if key in text:
-            return val
-
-    return best_brand if best_score > 0 else "Unknown"
-
-# -----------------------------
+# -----------------------------------
 # INPUT BOX
-# -----------------------------
+# -----------------------------------
 st.markdown("<div class='box'>", unsafe_allow_html=True)
-user_text = st.text_area("Paste your messy item description:", height=200)
+user_text = st.text_area("Paste your messy item description:", height=180)
 
 if st.button("Generate Listing 💸"):
     if check_paywall():
         st.session_state["uses"] += 1
 
-        # Extract colour + item name properly
-        words = user_text.lower().split()
+        text = user_text.lower().strip()
+        words = text.split()
 
-        colours = ["black","white","grey","gray","blue","red","green","yellow","pink","purple","brown","beige","cream","navy","orange"]
+        # Detect brand
+        brand = best_match_brand(text)
+
+        # Detect colour
+        colours = [
+            "black","white","grey","gray","blue","navy","red","green","yellow","pink","purple",
+            "brown","beige","cream","orange","burgundy","khaki","tan","teal"
+        ]
         colour = next((w for w in words if w in colours), "")
 
-        items = ["shorts","shirt","tshirt","t-shirt","hoodie","jacket","coat","jeans","trousers","leggings","skirt","dress","top","jumper","sweater"]
+        # Detect item type
+        items = [
+            "shorts","shirt","tshirt","t-shirt","hoodie","jacket","coat","jeans","trousers",
+            "leggings","skirt","dress","top","jumper","sweater","cargo","joggers","tracksuit"
+        ]
         item = next((w for w in words if w in items), "item")
 
+        # Build title
         title = f"{brand} {colour.capitalize()} {item.capitalize()}".strip()
 
-        description = f"{brand} {item} in {colour} colour. Good condition and ideal for everyday wear. Clean, comfy and ready to ship!"
+        # Build description
+        description = (
+            f"{brand} {item} in {colour} colour. "
+            "Great condition with no major flaws. "
+            "Perfect for everyday wear and super comfortable. "
+            "Fast dispatch and smoke-free home."
+        )
 
+        # Tags
         tags = [brand, colour, item, "fashion", "vinted", "sellsmart"]
 
-        price = "£4.00 - £6.00"
+        # Price suggestion
+        price = "£4.00 - £8.00"
 
+        # Output
         st.success("Listing generated successfully!")
-        st.markdown(f"**Title:** {title}")
-        st.markdown(f"**Description:** {description}")
-        st.markdown(f"**Tags:** {', '.join(tags)}")
-        st.markdown(f"**Suggested Price:** {price}")
+        st.markdown("<div class='output-box'>", unsafe_allow_html=True)
+        st.markdown(f"### 🏷️ Title\n{title}")
+        st.markdown(f"### 📝 Description\n{description}")
+        st.markdown(f"### 🔖 Tags\n{', '.join(tags)}")
+        st.markdown(f"### 💷 Suggested Price\n{price}")
+        st.markdown("</div>", unsafe_allow_html=True)
 
-        # Simple demo output
-        brand = best_match_brand(user_text)
-        # Extract colour + item name properly
-words = user_text.lower().split()
-
-# Find colour
-colours = ["black","white","grey","gray","blue","red","green","yellow","pink","purple","brown","beige","cream","navy","orange"]
-colour = next((w for w in words if w in colours), "")
-
-# Find item type (shorts, shirt, hoodie, jeans, etc.)
-items = ["shorts","shirt","tshirt","t-shirt","hoodie","jacket","coat","jeans","trousers","leggings","skirt","dress","top","jumper","sweater"]
-item = next((w for w in words if w in items), "item")
-
-# Build clean title
-title = f"{brand} {colour.capitalize()} {item.capitalize()}".strip()
-        description = f"{brand} {item} in {colour} colour. Good condition and ideal for everyday wear. Clean, comfy and ready to ship!"
-        tags = [brand, colour, item, "fashion", "vinted", "sellsmart"]
-        price = "£4.00 - £6.00"
-
-        st.success("Listing generated successfully!")
-        st.markdown(f"**Title:** {title}")
-        st.markdown(f"**Description:** {description}")
-        st.markdown(f"**Tags:** {', '.join(tags)}")
-        st.markdown(f"**Suggested Price:** {price}")
-        
 st.markdown("</div>", unsafe_allow_html=True)
