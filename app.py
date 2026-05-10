@@ -685,21 +685,9 @@ st.markdown("""
 
 <div style='text-align:center; font-size:14px; color:#9ca3af;'>
     SellSmart AI © 2026<br>
-    <a href="/terms" target="_blank">Terms of Service</a> •
-    <a href="/privacy" target="_blank">Privacy Policy</a> •
-    <a href="/aup" target="_blank">Acceptable Use</a> •
-    <a href="/refunds" target="_blank">Refund Policy</a>
+    <a href="#" onclick="window.location.href='/?page=Terms'">Terms of Service</a> •
+    <a href="#" onclick="window.location.href='/?page=Privacy'">Privacy Policy</a> •
+    <a href="#" onclick="window.location.href='/?page=AUP'">Acceptable Use</a> •
+    <a href="#" onclick="window.location.href='/?page=Refunds'">Refund Policy</a>
 </div>
 """, unsafe_allow_html=True)
-st.markdown("""
-<hr style='margin-top:40px; margin-bottom:10px;'>
-
-<div style='text-align:center; font-size:14px; color:#9ca3af;'>
-    SellSmart AI © 2026<br>
-    <a href="/terms" target="_blank">Terms of Service</a> •
-    <a href="/privacy" target="_blank">Privacy Policy</a> •
-    <a href="/aup" target="_blank">Acceptable Use</a> •
-    <a href="/refunds" target="_blank">Refund Policy</a>
-</div>
-""", unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
