@@ -641,7 +641,7 @@ def generate_listing(details):
 
 # -----------------------------------
 # INPUT
-# -----------------------------------
+# -----------------------------------st.markdown("<div class='card'>", unsafe_allow_html=True)
 user_text = st.text_area(
     "Paste your messy item description:",
     height=150,
@@ -702,3 +702,4 @@ st.markdown("""
     <a href="/refunds" target="_blank">Refund Policy</a>
 </div>
 """, unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
