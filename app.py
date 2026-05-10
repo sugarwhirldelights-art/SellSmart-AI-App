@@ -707,17 +707,20 @@ def flaw_severity(details: dict) -> float:
     flaws = details["flaws"].lower()
 
     severity = 1.0
+
     if "rip" in flaws or "tear" in flaws:
         severity -= 0.15
+
     if "hole" in flaws:
         severity -= 0.10
+
     if "stain" in flaws or "mark" in flaws:
         severity -= 0.08
-    if "bobble" in flaws:
+
+    if "bobble" in flaws or "bobbly" in flaws or "pilling" in flaws:
         severity -= 0.05
 
     return max(0.65, severity)
-
 
 # =========================================================
 # QUICK SALE MODE (OPTIONAL)
