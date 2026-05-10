@@ -26,22 +26,11 @@ st.set_page_config(
     layout="centered"
 )
 
-# Premium UI styling
-st.markdown("""
-<style>
-body {background-color: #f0f2f6;}
-.big-title {font-size: 40px; font-weight: 800; text-align: center; color: #1f2933;}
-.sub {font-size: 18px; text-align: center; color: #6b7280;}
-.box {background: white; padding: 24px; border-radius: 16px; box-shadow: 0 10px 30px rgba(15,23,42,0.12);}
-.output-box {background: #f9fafb; padding: 18px; border-radius: 12px; border: 1px solid #e5e7eb;}
-.badge {display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600;}
-.badge-free {background:#e5f3ff; color:#1d4ed8;}
-.badge-premium {background:#fef3c7; color:#92400e;}
-</style>
-""", unsafe_allow_html=True)
-
-st.markdown("<div class='big-title'>SellSmart AI</div>", unsafe_allow_html=True)
-st.markdown("<div class='sub'>Turn messy Vinted ideas into clean, ready-to-post listings.</div>", unsafe_allow_html=True)
+# -----------------------------------
+# HEADER WITH YOUR LOGO
+# -----------------------------------
+st.image("logo.png", width=180)
+st.markdown("<h3 style='text-align:center; color:#6b7280;'>Create perfect Vinted listings in seconds</h3>", unsafe_allow_html=True)
 st.write("")
 
 # -----------------------------------
@@ -53,10 +42,7 @@ def check_paywall():
 
     if st.session_state["uses"] < 3:
         left = 3 - st.session_state["uses"]
-        st.markdown(
-            f"<span class='badge badge-free'>Free uses left today: {left}</span>",
-            unsafe_allow_html=True
-        )
+        st.info(f"Free uses left today: {left}")
         return True
 
     st.error("You’ve reached your free limit (3 listings/day). Upgrade to Premium for unlimited use.")
@@ -100,7 +86,7 @@ def best_match_brand(text):
     return best.title()
 
 # -----------------------------------
-# HELPER: PRICE ESTIMATE
+# PRICE ESTIMATOR
 # -----------------------------------
 def estimate_price(brand, item):
     brand = brand.lower()
@@ -121,28 +107,19 @@ def estimate_price(brand, item):
     return f"£{base_low:.0f}.00 - £{base_high:.0f}.00"
 
 # -----------------------------------
-# MAIN BOX
+# INPUT
 # -----------------------------------
-st.markdown("<div class='box'>", unsafe_allow_html=True)
-
-st.markdown(
-    "<span class='badge badge-premium'>v2.0 • Listing Generator</span>",
-    unsafe_allow_html=True
-)
-st.write("")
-
 user_text = st.text_area(
     "Paste your messy item description:",
-    height=160,
-    placeholder="e.g. blue primark shorts size 10 worn a few times but still good"
+    height=150,
+    placeholder="e.g. blue primark shorts size 10 worn a few times"
 )
 
-col1, col2 = st.columns([2, 1])
-with col1:
-    generate = st.button("Generate Listing 💸", use_container_width=True)
-with col2:
-    st.write("")
+generate = st.button("Generate Listing 💸", use_container_width=True)
 
+# -----------------------------------
+# GENERATOR
+# -----------------------------------
 if generate:
     if check_paywall():
         st.session_state["uses"] += 1
@@ -167,66 +144,49 @@ if generate:
         ]
         item = next((w for w in words if w in items), "item")
 
-        # Detect condition keywords
-        condition_words = {
-            "new": ["new","brand new","with tags","nwt"],
-            "excellent": ["like new","worn once","hardly worn"],
-            "good": ["good condition","no major flaws","no marks"],
-            "used": ["worn","used","some wear","a bit worn"]
-        }
+        # Detect condition
         condition_label = "Good used condition"
-        for label, kws in condition_words.items():
-            if any(kw in text for kw in kws):
-                if label == "new":
-                    condition_label = "Brand new / with tags"
-                elif label == "excellent":
-                    condition_label = "Excellent condition"
-                elif label == "good":
-                    condition_label = "Good condition"
-                else:
-                    condition_label = "Used but still in good wearable condition"
-                break
+        if "new" in text or "with tags" in text:
+            condition_label = "Brand new / with tags"
+        elif "like new" in text or "worn once" in text:
+            condition_label = "Excellent condition"
+        elif "worn" in text or "used" in text:
+            condition_label = "Used but still in good wearable condition"
 
         # Build title
-        title_parts = []
-        if brand != "Unknown":
-            title_parts.append(brand)
-        if colour:
-            title_parts.append(colour.capitalize())
-        title_parts.append(item.capitalize())
-        title = " ".join(title_parts).strip()
+        title = " ".join([
+            brand if brand != "Unknown" else "",
+            colour.capitalize() if colour else "",
+            item.capitalize()
+        ]).strip()
 
         # Build description
         description = (
             f"{title}.\n\n"
             f"{condition_label}. No major flaws unless stated. "
             "Perfect for everyday wear and easy to style.\n\n"
-            "From a smoke-free home. Will be posted quickly after purchase."
+            "From a smoke-free home. Fast dispatch."
         )
 
         # Tags
         tags = [t for t in [brand, colour, item, "fashion", "vinted", "sellsmart"] if t]
 
-        # Price suggestion
+        # Price
         price = estimate_price(brand, item)
 
+        # Output
         st.success("Listing generated successfully!")
 
-        st.markdown("<div class='output-box'>", unsafe_allow_html=True)
         st.markdown("### 🏷️ Title")
-        st.code(title, language="text")
+        st.code(title)
 
         st.markdown("### 📝 Description")
-        st.code(description, language="text")
+        st.code(description)
 
         st.markdown("### 🔖 Tags")
-        st.code(", ".join(tags), language="text")
+        st.code(", ".join(tags))
 
         st.markdown("### 💷 Suggested Price")
-        st.code(price, language="text")
+        st.code(price)
 
-        # Copy buttons (simple UX hint)
-        st.info("Tip: long‑press on any box to copy on mobile, or use right‑click → copy on desktop.")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
+        st.info("Tip: long‑press to copy on mobile, or right‑click → copy on desktop.")
