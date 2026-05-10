@@ -29,7 +29,7 @@ st.set_page_config(
 # -----------------------------------
 # HEADER WITH YOUR LOGO
 # -----------------------------------
-st.image("logo.png", width=180)
+st.image("image_1778389857310.jpeg", width=180)
 st.markdown("<h3 style='text-align:center; color:#6b7280;'>Create perfect Vinted listings in seconds</h3>", unsafe_allow_html=True)
 st.write("")
 
