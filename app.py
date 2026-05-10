@@ -131,6 +131,29 @@ if st.button("Generate Listing 💸"):
     if check_paywall():
         st.session_state["uses"] += 1
 
+        # Extract colour + item name properly
+        words = user_text.lower().split()
+
+        colours = ["black","white","grey","gray","blue","red","green","yellow","pink","purple","brown","beige","cream","navy","orange"]
+        colour = next((w for w in words if w in colours), "")
+
+        items = ["shorts","shirt","tshirt","t-shirt","hoodie","jacket","coat","jeans","trousers","leggings","skirt","dress","top","jumper","sweater"]
+        item = next((w for w in words if w in items), "item")
+
+        title = f"{brand} {colour.capitalize()} {item.capitalize()}".strip()
+
+        description = f"{brand} {item} in {colour} colour. Good condition and ideal for everyday wear. Clean, comfy and ready to ship!"
+
+        tags = [brand, colour, item, "fashion", "vinted", "sellsmart"]
+
+        price = "£4.00 - £6.00"
+
+        st.success("Listing generated successfully!")
+        st.markdown(f"**Title:** {title}")
+        st.markdown(f"**Description:** {description}")
+        st.markdown(f"**Tags:** {', '.join(tags)}")
+        st.markdown(f"**Suggested Price:** {price}")
+
         # Simple demo output
         brand = best_match_brand(user_text)
         # Extract colour + item name properly
