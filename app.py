@@ -15,8 +15,8 @@ HISTORY_FILE = "history.json"
 DAILY_FREE_LIMIT = 5
 
 # Stripe links – replace with real ones
-WEEKLY_LINK = "https://buy.stripe.com/YOUR_REAL_WEEKLY_LINK"
-MONTHLY_LINK = "https://buy.stripe.com/YOUR_REAL_MONTHLY_LINK"
+WEEKLY_LINK = "https://buy.stripe.com/aFadR9arXe0m6Mv4wHg3601"
+MONTHLY_LINK = "https://buy.stripe.com/9B63cvfMhg8u3Aj4wHg3602"
 
 # =========================
 # SESSION STATE
